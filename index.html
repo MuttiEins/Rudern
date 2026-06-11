@@ -3,688 +3,569 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Woofwatch</title>
+<title>Rudern auf Deutsch</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --espresso:   #0A1628;
-    --brass:      #2A6CC8;
-    --brass-light:#4B8FE8;
-    --brass-dark: #1A4A8A;
-    --ivory:      #D0E4F8;
-    --ivory-dark: #A8C8E8;
-    --mahogany:   #1A3A6A;
-    --shadow:     #050D1A;
-    --dog-fur:    #1B3A5C;
-    --dog-stripe: #22507A;
-  }
-
-  body {
-    min-height: 100vh;
-    background: radial-gradient(ellipse at center, #0d2a4a 0%, #061528 70%, #020810 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Special Elite', cursive;
-    overflow: hidden;
-    user-select: none;
-  }
-
-  /* Dust/grain overlay */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 100;
-  }
-
-  .watch-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
-  }
-
-  /* ── Crown / top loop ── */
-  .crown-assembly {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  /* ── Dog floppy ears ── */
-  .dog-ears {
-    display: flex;
-    gap: 120px;
-    margin-bottom: -18px;
-    position: relative;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .ear {
-    width: 36px;
-    height: 52px;
-    background: linear-gradient(160deg, #2A6CC8, #1A4A8A);
-    border-radius: 50% 50% 60% 60% / 30% 30% 70% 70%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 2px 4px rgba(100,180,255,0.15);
-    position: relative;
-  }
-  .ear::after {
-    content: '';
-    position: absolute;
-    top: 6px; left: 6px;
-    width: 22px; height: 36px;
-    background: linear-gradient(160deg, #3A80D8, #1A4A8A);
-    border-radius: 50% 50% 60% 60% / 30% 30% 70% 70%;
-    opacity: 0.5;
-  }
-  .ear.left  { transform: rotate(15deg) translateX(8px); }
-  .ear.right { transform: rotate(-15deg) translateX(-8px); }
-
-  .crown-loop {
-    width: 38px; height: 24px;
-    border: 5px solid var(--brass);
-    border-bottom: none;
-    border-radius: 19px 19px 0 0;
-    background: transparent;
-    box-shadow: 0 -2px 8px rgba(42,108,200,0.3), inset 0 2px 4px rgba(0,0,0,0.3);
-    position: relative;
-    z-index: 1;
-  }
-
-  .crown-stem {
-    width: 14px; height: 22px;
-    background: linear-gradient(90deg, var(--brass-dark), var(--brass-light), var(--brass-dark));
-    border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-    margin-top: -2px;
-    position: relative;
-    z-index: 0;
-  }
-
-  /* ── Main case ── */
-  .watch-case-outer {
-    width: 340px; height: 340px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      #0d2a5a, #2A6CC8, #4B8FE8, #2A6CC8, #1A4A8A,
-      #2A6CC8, #4B8FE8, #2A6CC8, #0d2a5a, #2A6CC8,
-      #4B8FE8, #2A6CC8, #0d2a5a
-    );
-    padding: 8px;
-    box-shadow:
-      0 0 0 2px #061528,
-      0 8px 40px rgba(0,0,0,0.8),
-      0 0 60px rgba(42,108,200,0.2),
-      inset 0 2px 4px rgba(100,180,255,0.3);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .watch-case-inner {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 35% 30%, #0d2a4a, #061528 60%, #020810);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 4px 20px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.4);
-  }
-
-  /* ── Dial ── */
-  .dial {
-    width: 296px; height: 296px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 40% 35%, #EEF4FF, #D8E8F8 50%, #BACED8 100%);
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-      inset 0 2px 8px rgba(0,0,0,0.15),
-      inset 0 0 30px rgba(10,60,120,0.08);
-  }
-
-  /* Aged paper texture rings */
-  .dial::before {
-    content: '';
-    position: absolute; inset: 0;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 50% 50%, transparent 82%, rgba(10,60,120,0.1) 83%, transparent 84%),
-      radial-gradient(circle at 50% 50%, transparent 88%, rgba(10,60,120,0.06) 89%, transparent 90%);
-  }
-
-  /* Dog face markings */
-  .cat-markings {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: linear-gradient(180deg, rgba(20,80,160,0.06) 0%, transparent 35%);
-  }
-
-  /* Minute track ring */
-  .minute-ring {
-    position: absolute;
-    inset: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(10,60,120,0.15);
-  }
-
-  /* ── Tick marks ── */
-  .ticks {
-    position: absolute;
-    inset: 0;
-  }
-
-  /* ── Whisker lines ── */
-  .whiskers {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  /* ── Dog nose (round) ── */
-  .cat-nose {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -18px);
-    width: 18px;
-    height: 14px;
-    background: radial-gradient(ellipse at 40% 35%, #334, #111);
-    border-radius: 50% 50% 45% 45%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.1);
-  }
-
-  /* ── Dog mouth ── */
-  .cat-mouth {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -6px);
-    width: 22px;
-    height: 10px;
-  }
-  .cat-mouth svg { overflow: visible; }
-
-  /* ── Eye sub-dials ── */
-  .eyes-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .eye-dial {
-    position: absolute;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 40% 35%, #2a4a6a, #0d2a40 60%, #061520);
-    border: 2px solid var(--brass-dark);
-    box-shadow:
-      0 2px 8px rgba(0,0,0,0.5),
-      inset 0 1px 3px rgba(255,255,255,0.05);
-    overflow: visible;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .eye-dial.left  { transform: translate(-44px, -36px); }
-  .eye-dial.right { transform: translate(44px, -36px); }
-
-  /* Eye shine */
-  .eye-dial::before {
-    content: '';
-    position: absolute;
-    width: 10px; height: 6px;
-    background: radial-gradient(ellipse, rgba(255,255,255,0.5), transparent);
-    border-radius: 50%;
-    top: 8px; left: 10px;
-    pointer-events: none;
-  }
-
-  /* Pupil (second hand indicator) */
-  .pupil {
-    position: absolute;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #1a1a2e, #000);
-    box-shadow: 0 0 4px rgba(0,0,0,0.8);
-  }
-
-  .pupil-hand {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: bottom center;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 18px;
-    background: linear-gradient(to top, transparent, #C87A88, #C87A88);
-    border-radius: 1px;
-  }
-
-  /* ── Centre pivot ── */
-  .pivot {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, var(--brass-light), var(--brass-dark));
-    box-shadow: 0 1px 4px rgba(0,0,0,0.6), 0 0 0 2px rgba(0,0,0,0.3);
-    z-index: 20;
-  }
-
-  /* ── Hands ── */
-  .hands {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .hand-minute, .hand-hour {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: bottom center;
-    transform: translateX(-50%);
-    border-radius: 3px 3px 2px 2px;
-  }
-
-  .hand-minute {
-    width: 5px;
-    height: 118px;
-    background: linear-gradient(to top, #061528, #1a3a6a 40%, #0d2240 70%, #061528);
-    box-shadow: 1px 0 4px rgba(0,0,0,0.4);
-    margin-bottom: -8px;
-  }
-
-  .hand-minute::after {
-    content: '►';
-    position: absolute;
-    top: -2px;
-    left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    font-size: 8px;
-    color: var(--brass);
-  }
-
-  .hand-hour {
-    width: 7px;
-    height: 76px;
-    background: linear-gradient(to top, #061528, #0d2a4a 40%, #061828 70%, #061528);
-    box-shadow: 1px 0 4px rgba(0,0,0,0.5);
-    margin-bottom: -6px;
-  }
-
-  /* ── Numerals ── */
-  .numeral {
-    position: absolute;
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: #0A1628;
-    text-align: center;
-    line-height: 1;
-    transform: translate(-50%, -50%);
-  }
-
-  /* ── Brand text ── */
-  .brand-text {
-    position: absolute;
-    text-align: center;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 62%;
-    font-family: 'Special Elite', cursive;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: #1A3A6A;
-    opacity: 0.7;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  /* ── Digital readout ── */
-  .digital-readout {
-    position: absolute;
-    bottom: 22%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(5,15,40,0.85);
-    border: 1px solid var(--brass-dark);
-    border-radius: 4px;
-    padding: 3px 10px;
-    font-family: 'Special Elite', cursive;
-    font-size: 12px;
-    color: var(--brass-light);
-    letter-spacing: 2px;
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.5), 0 0 6px rgba(42,108,200,0.2);
-    white-space: nowrap;
-    min-width: 80px;
-    text-align: center;
-  }
-
-  /* ── Controls ── */
-  .controls {
-    display: flex;
-    gap: 18px;
-    align-items: center;
-  }
-
-  .btn {
-    font-family: 'Special Elite', cursive;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 10px 24px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-start {
-    background: linear-gradient(135deg, #1A4A8A, var(--brass), #4B8FE8, var(--brass), #1A4A8A);
-    background-size: 200% 200%;
-    color: #EEF4FF;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(150,210,255,0.3);
-  }
-  .btn-start:hover { background-position: 100% 100%; box-shadow: 0 4px 18px rgba(42,108,200,0.4), inset 0 1px 0 rgba(150,210,255,0.3); }
-  .btn-start:active { transform: translateY(1px); }
-
-  .btn-reset {
-    background: linear-gradient(135deg, #061528, #0d2a4a, #061528);
-    color: var(--ivory-dark);
-    border: 1px solid var(--brass-dark);
-    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
-  }
-  .btn-reset:hover { background: linear-gradient(135deg, #0d2a4a, #1a3a6a, #0d2a4a); }
-  .btn-reset:active { transform: translateY(1px); }
-
-  .elapsed-display {
-    font-family: 'Playfair Display', serif;
-    font-size: 11px;
-    color: var(--brass-light);
-    letter-spacing: 1px;
-    opacity: 0.7;
-    text-align: center;
-  }
-
-  /* Lap ghost hand */
-  .hand-lap {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: bottom center;
-    transform: translateX(-50%);
-    width: 3px;
-    height: 100px;
-    background: linear-gradient(to top, transparent, rgba(42, 108, 200, 0.4));
-    border-radius: 2px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    margin-bottom: -6px;
-  }
-  .hand-lap.visible { opacity: 1; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e8e0d5; font-family: Georgia, serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 16px 40px; }
+  header { width: 100%; max-width: 720px; padding: 24px 0 12px; border-bottom: 2px solid #2a9d8f33; margin-bottom: 20px; display: flex; align-items: baseline; gap: 12px; }
+  .title { font-size: 26px; font-weight: 700; color: #2a9d8f; }
+  .subtitle { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; font-family: monospace; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px; max-width: 720px; width: 100%; }
+  .tab { background: transparent; border: 1.5px solid #333; color: #888; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 13px; font-family: monospace; transition: all 0.18s; }
+  .tab.active { color: #fff; }
+  .progress-bar-wrap { width: 100%; max-width: 560px; margin-bottom: 18px; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 6px; font-family: monospace; }
+  .progress-track { height: 4px; background: #1e2533; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+  .flip-toggle { margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .flip-btn { background: #1a2030; border: 1px solid #333; border-radius: 20px; padding: 5px 14px; color: #aaa; cursor: pointer; font-size: 12px; font-family: monospace; }
+  .mode-toggle { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; max-width: 620px; width: 100%; }
+  .mode-btn { background: transparent; border: 1.5px solid #333; color: #666; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: monospace; transition: all 0.18s; }
+  .mode-btn.active { background: #1a2a3a; border-color: #2a9d8f; color: #2a9d8f; font-weight: 700; }
+  .audio-front { background: #0c1a2a !important; border-color: #2a9d8f55 !important; }
+  body.mode-audio #front-text { visibility: hidden !important; height: 0 !important; overflow: hidden !important; margin: 0 !important; padding: 0 !important; font-size: 0 !important; }
+  body.mode-audio #card-front { background: #0c1a2a !important; border-color: #2a9d8f55 !important; }
+  body.mode-en-audio #card-back { background: #0c1a2a !important; border-color: #2a9d8f55 !important; }
+  .audio-icon { font-size: 64px; margin-bottom: 8px; }
+  .card-wrap { width: 100%; max-width: 560px; min-height: 260px; perspective: 800px; cursor: pointer; margin-bottom: 20px; position: relative; transition: transform 0.22s ease, opacity 0.22s ease; }
+  .card-inner { width: 100%; min-height: 260px; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4,0.2,0.2,1); position: relative; }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; width: 100%; min-height: 260px; backface-visibility: hidden; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 36px; }
+  .card-front { background: #111824; border: 2px solid #1e2a3a; box-shadow: 0 12px 40px #00000066; }
+  .card-front.known { background: #0d2a1e; border-color: #2a9d8f55; }
+  .card-front.unknown { background: #2a0d12; border-color: #e6394655; }
+  .card-back { background: #0c1520; transform: rotateY(180deg); box-shadow: 0 12px 40px #00000066; }
+  .card-lang { font-size: 12px; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; opacity: 0.8; }
+  .card-text { font-size: 32px; font-weight: 600; text-align: center; color: #f0ebe3; line-height: 1.3; letter-spacing: -0.3px; }
+  .card-text.long { font-size: 20px; }
+  .card-text.medium { font-size: 26px; }
+  .card-note { margin-top: 12px; padding: 5px 12px; background: #ffffff08; border-radius: 8px; font-size: 12px; color: #888; font-family: monospace; }
+  .card-hint { margin-top: 14px; font-size: 12px; color: #333; font-family: monospace; letter-spacing: 1px; }
+  .speak-btn { margin-top: 14px; background: #ffffff0a; border: 1.5px solid #2a3545; border-radius: 50%; width: 46px; height: 46px; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .speak-btn.speaking { transform: scale(1.15); border-color: #2a9d8f; background: #2a9d8f22; }
+  .actions { display: flex; gap: 12px; margin-bottom: 18px; align-items: center; }
+  .nav-btn { background: transparent; border: 1.5px solid #2a3545; color: #666; border-radius: 10px; padding: 10px 18px; cursor: pointer; font-size: 18px; }
+  .still-btn { background: #e63946; border: none; color: #fff; border-radius: 12px; padding: 14px 24px; cursor: pointer; font-size: 18px; font-weight: 700; font-family: Georgia, serif; box-shadow: 0 4px 12px #e6394655; }
+  .gotit-btn { background: #2a9d8f; border: none; color: #fff; border-radius: 12px; padding: 14px 24px; cursor: pointer; font-size: 18px; font-weight: 700; font-family: Georgia, serif; box-shadow: 0 4px 12px #2a9d8f55; }
+  .shuffle-btn { background: transparent; border: none; color: #444; cursor: pointer; font-size: 12px; font-family: monospace; letter-spacing: 1px; margin-bottom: 8px; }
+  .key-hint { font-size: 11px; color: #2a3545; font-family: monospace; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
 
-<div class="watch-wrapper">
+<header>
+  <div class="title">Rudern auf Deutsch</div>
+  <div class="subtitle">Rowing Flashcards</div>
+</header>
 
-  <!-- Crown -->
-  <div class="crown-assembly">
-    <div class="dog-ears">
-      <div class="ear left"></div>
-      <div class="ear right"></div>
-    </div>
-    <div class="crown-loop"></div>
-    <div class="crown-stem"></div>
+<div class="tabs" id="tabs"></div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-info">
+    <span id="card-counter">Card 1 / 1</span>
+    <span style="color:#2a9d8f" id="known-counter">✓ 0 known</span>
   </div>
-
-  <!-- Main case -->
-  <div class="watch-case-outer">
-    <div class="watch-case-inner">
-      <div class="dial" id="dial">
-
-        <div class="cat-markings"></div>
-        <div class="minute-ring"></div>
-
-        <!-- Tick marks drawn by JS -->
-        <svg class="ticks" id="ticks" viewBox="0 0 296 296">
-          <!-- Dog cheek spots -->
-          <circle cx="88" cy="168" r="14" fill="rgba(42,108,200,0.07)"/>
-          <circle cx="208" cy="168" r="14" fill="rgba(42,108,200,0.07)"/>
-        </svg>
-
-        <!-- Numerals placed by JS -->
-        <div id="numerals"></div>
-
-        <!-- Eyes (sub-dials) -->
-        <div class="eyes-container">
-          <div class="eye-dial left" id="eye-left">
-            <div class="pupil-hand" id="pupil-hand-left"></div>
-          </div>
-          <div class="eye-dial right" id="eye-right">
-            <div class="pupil-hand" id="pupil-hand-right"></div>
-          </div>
-        </div>
-
-        <!-- Cat nose -->
-        <div class="cat-nose"></div>
-
-        <!-- Dog mouth -->
-        <div class="cat-mouth">
-          <svg width="28" height="14" viewBox="0 0 28 14">
-            <path d="M4 2 Q14 14 24 2" fill="none" stroke="rgba(10,40,100,0.4)" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <!-- Lap ghost hand -->
-        <div class="hand-lap" id="lapHand"></div>
-
-        <!-- Hands -->
-        <div class="hands">
-          <div class="hand-hour" id="hourHand" style="transform: translateX(-50%) rotate(0deg);"></div>
-          <div class="hand-minute" id="minuteHand" style="transform: translateX(-50%) rotate(0deg);"></div>
-        </div>
-
-        <!-- Centre pivot -->
-        <div class="pivot"></div>
-
-        <!-- Brand -->
-        <div class="brand-text">Woofwatch · Swiss Wag</div>
-
-        <!-- Digital elapsed -->
-        <div class="digital-readout" id="digitalReadout">00:00.0</div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button class="btn btn-reset" id="btnReset" onclick="resetWatch()">Reset</button>
-    <button class="btn btn-start" id="btnStart" onclick="toggleWatch()">Start</button>
-  </div>
-
-  <div class="elapsed-display" id="elapsedDisplay">0 min · 0 sec</div>
-
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
 </div>
 
+<div class="mode-toggle">
+  <button class="mode-btn active" id="mode-de-en" onclick="setMode('de-en')">🇩🇪 → 🇬🇧 German to English</button>
+  <button class="mode-btn" id="mode-en-de" onclick="setMode('en-de')">🇬🇧 → 🇩🇪 English to German</button>
+  <button class="mode-btn" id="mode-audio" onclick="setMode('audio')">🔊 Audio only</button>
+  <button class="mode-btn" id="mode-en-audio" onclick="setMode('en-audio')">🇬🇧 → 🔊 English then Audio</button>
+</div>
+
+<div class="card-wrap" id="card-wrap" onclick="flipCard()">
+  <div class="card-inner" id="card-inner">
+    <div class="card-face card-front" id="card-front">
+      <div class="card-lang" id="front-lang"></div>
+      <div class="card-text" id="front-text"></div>
+      <button class="speak-btn" id="speak-btn" onclick="event.stopPropagation(); speakWord()">🔈</button>
+      <div class="card-hint" id="card-hint">tap card to flip ↩</div>
+    </div>
+    <div class="card-face card-back" id="card-back">
+      <div class="card-lang" id="back-lang"></div>
+      <div class="card-text" id="back-text"></div>
+      <div class="card-text" id="back-text-de" style="margin-top:8px;font-size:20px;color:#2a9d8f;display:none"></div>
+      <button class="speak-btn" id="speak-btn-back" onclick="event.stopPropagation(); speakWord()" style="display:none;margin-top:12px">🔈</button>
+      <div class="card-note" id="back-note" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="nav-btn" onclick="go(-1)">←</button>
+  <button class="still-btn" onclick="markUnknown()">✗ Still learning</button>
+  <button class="gotit-btn" onclick="markKnown()">✓ Got it</button>
+  <button class="nav-btn" onclick="go(1)">→</button>
+</div>
+
+<button class="shuffle-btn" onclick="shuffleDeck()">⟳ Shuffle deck</button>
+<button class="shuffle-btn" onclick="resetToday()" style="color:#e63946;margin-left:12px">✕ Reset today's progress</button>
+<div class="key-hint">space/enter = flip &nbsp;·&nbsp; ← → = navigate &nbsp;·&nbsp; g = got it &nbsp;·&nbsp; b = still learning</div>
+
 <script>
-  const R = 148; // dial radius (SVG units)
-  const ticksEl = document.getElementById('ticks');
-  const numeralsEl = document.getElementById('numerals');
+const CATEGORIES = {
+  commands: { label:"Commands", emoji:"📢", color:"#e63946", cards:[
+    {de:"Einsteigen!",en:"Get in!"},{de:"Aussteigen!",en:"Get out!"},
+    {de:"Fertig machen!",en:"Get ready!"},{de:"Los!",en:"Go!"},
+    {de:"Halt!",en:"Stop!"},{de:"Ruder halt!",en:"Stop rowing!"},
+    {de:"Alles vorwärts!",en:"Everyone row forward!"},{de:"Alles rückwärts!",en:"Everyone row backward!"},
+    {de:"Backbord!",en:"Port side!"},{de:"Steuerbord!",en:"Starboard side!"},
+    {de:"Langsam!",en:"Slowly!"},{de:"Schneller!",en:"Faster!"},
+    {de:"Geradeaus!",en:"Straight ahead!"},{de:"Wenden!",en:"Turn!"},
+    {de:"Vorsicht!",en:"Careful!"},{de:"Achtung!",en:"Attention!"},
+    {de:"Skulls lang!",en:"Hold sculls/oars parallel!"},{de:"Ruder hoch!",en:"Oars up!"},
+    {de:"Boot tragen!",en:"Carry the boat!"},{de:"Boot einsetzen!",en:"Put the boat in the water!"}
+  ]},
+  words: { label:"Vocabulary", emoji:"🚣", color:"#2a9d8f", cards:[
+    {de:"das Rudern",en:"rowing",note:"neuter • no plural"},
+    {de:"der Ruderer",en:"male rower / rower",note:"masc • die Ruderer"},
+    {de:"die Ruderin",en:"female rower",note:"fem • die Ruderinnen"},
+    {de:"die Mannschaft",en:"crew / team",note:"fem • die Mannschaften"},
+    {de:"das Boot",en:"boat",note:"neuter • die Boote"},
+    {de:"das Ruderboot",en:"rowing boat",note:"neuter • die Ruderboote"},
+    {de:"der Einer",en:"single scull",note:"masc • die Einer"},
+    {de:"der Zweier",en:"double / pair",note:"masc • die Zweier"},
+    {de:"der Vierer",en:"four",note:"masc • die Vierer"},
+    {de:"der Achter",en:"eight",note:"masc • die Achter"},
+    {de:"das Ruder",en:"oar / blade",note:"neuter • die Ruder"},
+    {de:"der Riemen",en:"sweep oar",note:"masc • die Riemen"},
+    {de:"das Blatt",en:"blade",note:"neuter • die Blätter"},
+    {de:"der Griff",en:"handle",note:"masc • die Griffe"},
+    {de:"der Rollsitz",en:"sliding seat",note:"masc • die Rollsitze"},
+    {de:"die Rollschiene",en:"slide / rail",note:"fem • die Rollschienen"},
+    {de:"das Stemmbrett",en:"foot stretcher",note:"neuter • die Stemmbretter"},
+    {de:"der Ausleger",en:"rigger",note:"masc • die Ausleger"},
+    {de:"die Dolle",en:"oarlock / gate",note:"fem • die Dollen"},
+    {de:"der Steg",en:"landing stage / pontoon",note:"masc • die Stege"},
+    {de:"das Bootshaus",en:"boathouse",note:"neuter • die Bootshäuser"},
+    {de:"die Fahrt",en:"outing / row",note:"fem • die Fahrten"},
+    {de:"das Training",en:"training session",note:"neuter • die Trainings"},
+    {de:"der Trainer",en:"male coach / trainer",note:"masc • die Trainer"},
+    {de:"der Schlag",en:"stroke",note:"masc • die Schläge"},
+    {de:"die Schlagzahl",en:"stroke rate",note:"fem • die Schlagzahlen"},
+    {de:"der Rhythmus",en:"rhythm",note:"masc • die Rhythmen"},
+    {de:"die Sicherheit",en:"safety",note:"fem • no plural"},
+    {de:"die Schwimmweste",en:"life jacket / buoyancy aid",note:"fem • die Schwimmwesten"},
+    {de:"der Fluss",en:"river",note:"masc • die Flüsse"},
+    {de:"der See",en:"lake",note:"masc • die Seen"},
+    {de:"die Strömung",en:"current",note:"fem • die Strömungen"},
+    {de:"die Welle",en:"wave",note:"fem • die Wellen"},
+    {de:"das Ufer",en:"bank / shore",note:"neuter • die Ufer"},
+    {de:"die Brücke",en:"bridge",note:"fem • die Brücken"},
+    {de:"die Schleuse",en:"lock",note:"fem • die Schleusen"},
+    {de:"der Bug",en:"bow",note:"masc • die Buge"},
+    {de:"das Heck",en:"stern",note:"neuter • die Hecks"},
+    {de:"der Steuermann",en:"cox / coxswain",note:"masc • die Steuermänner"},
+    {de:"das Gleichgewicht",en:"balance",note:"neuter • no plural"},
+    {de:"die Haltung",en:"posture",note:"fem • die Haltungen"},
+    {de:"die Strecke",en:"course / distance",note:"fem • die Strecken"},
+    {de:"das Tempo",en:"speed / pace",note:"neuter • die Tempi"},
+    {de:"die Kraft",en:"power / strength",note:"fem • die Kräfte"},
+    {de:"die Ausdauer",en:"endurance",note:"fem • no plural"},
+    {de:"das Kentern",en:"capsizing",note:"neuter • no plural"},
+    {de:"der Notfall",en:"emergency",note:"masc • die Notfälle"}
+  ]},
+  verbs: { label:"Verbs", emoji:"⚡", color:"#f4a261", cards:[
+    {de:"rudern",en:"to row",note:"er rudert • hat gerudert"},
+    {de:"steuern",en:"to steer",note:"er steuert • hat gesteuert"},
+    {de:"tragen",en:"to carry",note:"er trägt • hat getragen"},
+    {de:"einsetzen",en:"to put in / launch",note:"er setzt ein • hat eingesetzt"},
+    {de:"aussteigen",en:"to get out",note:"er steigt aus • ist ausgestiegen"},
+    {de:"einsteigen",en:"to get in",note:"er steigt ein • ist eingestiegen"},
+    {de:"wenden",en:"to turn",note:"er wendet • hat gewendet"},
+    {de:"stoppen",en:"to stop",note:"er stoppt • hat gestoppt"},
+    {de:"bremsen",en:"to brake / slow down",note:"er bremst • hat gebremst"},
+    {de:"halten",en:"to hold / stop",note:"er hält • hat gehalten"},
+    {de:"ziehen",en:"to pull",note:"er zieht • hat gezogen"},
+    {de:"drücken",en:"to push",note:"er drückt • hat gedrückt"},
+    {de:"üben",en:"to practise",note:"er übt • hat geübt"},
+    {de:"kentern",en:"to capsize",note:"er kentert • ist gekentert"},
+    {de:"schwimmen",en:"to swim",note:"er schwimmt • ist geschwommen"}
+  ]},
+  phrases: { label:"Phrases", emoji:"💬", color:"#7b2d8b", cards:[
+    {de:"Meine Arme tun weh.",en:"My arms hurt."},
+    {de:"Mein Rücken tut weh.",en:"My back hurts."},
+    {de:"Meine Beine tun weh.",en:"My legs hurt."},
+    {de:"Ich habe eine Blase.",en:"I have a blister."},
+    {de:"Ich bin müde.",en:"I am tired."},
+    {de:"Ich brauche eine Pause.",en:"I need a break."},
+    {de:"Können wir eine kurze Pause machen?",en:"Can we take a short break?"},
+    {de:"Mir ist schwindelig.",en:"I feel dizzy."},
+    {de:"Ist mein Rücken gerade genug?",en:"Is my back straight enough?"},
+    {de:"Ist meine Haltung richtig?",en:"Is my posture correct?"},
+    {de:"Sitze ich richtig?",en:"Am I sitting correctly?"},
+    {de:"Lehne ich mich zu weit zurück?",en:"Am I leaning too far back?"},
+    {de:"Ziehe ich zu früh?",en:"Am I pulling too early?"},
+    {de:"Rudere ich zu schnell?",en:"Am I rowing too fast?"},
+    {de:"Ist das Blatt tief genug im Wasser?",en:"Is the blade deep enough in the water?"},
+    {de:"Soll ich stärker ziehen?",en:"Should I pull harder?"},
+    {de:"Können Sie es mir noch einmal zeigen?",en:"Can you show me again?"},
+    {de:"Ich verstehe nicht.",en:"I don't understand."},
+    {de:"Bitte korrigieren Sie mich.",en:"Please correct me."},
+    {de:"Ich bin Anfänger.",en:"I'm a beginner."},
+    {de:"Das ist mein erster Ruderkurs.",en:"This is my first rowing course."},
+    {de:"Ich habe Angst zu kentern.",en:"I am afraid of capsizing."},
+    {de:"Brauche ich eine Schwimmweste?",en:"Do I need a life jacket?"},
+    {de:"Ich verliere das Gleichgewicht.",en:"I am losing my balance."},
+    {de:"Das Boot wackelt.",en:"The boat is wobbling."},
+    {de:"Ich bin bereit.",en:"I'm ready."},
+    {de:"Können wir anfangen?",en:"Can we start?"},
+    {de:"Auf welcher Seite bin ich?",en:"Which side am I on?"},
+    {de:"Bin ich auf der Backbordseite?",en:"Am I on port side?"},
+    {de:"Bin ich auf der Steuerbordseite?",en:"Am I on starboard side?"}
+  ]},
+  clothes: { label:"Clothing", emoji:"👕", color:"#457b9d", cards:[
+    {de:"die Kleidung",en:"clothing",note:"fem • no plural"},
+    {de:"die Sportsachen",en:"sports clothes",note:"plural only"},
+    {de:"der Schuh",en:"shoe",note:"masc • die Schuhe"},
+    {de:"die Flipflops",en:"flip-flops",note:"plural only"},
+    {de:"die Socke",en:"sock",note:"fem • die Socken"},
+    {de:"die Jacke",en:"jacket",note:"fem • die Jacken"},
+    {de:"die Regenjacke",en:"rain jacket",note:"fem • die Regenjacken"},
+    {de:"die Schwimmweste",en:"life jacket / buoyancy aid",note:"fem • die Schwimmwesten"},
+    {de:"die Mütze",en:"warm hat",note:"fem • die Mützen"},
+    {de:"die Kappe",en:"cap",note:"fem • die Kappen"},
+    {de:"die Sonnenbrille",en:"sunglasses",note:"fem • die Sonnenbrillen"},
+    {de:"der Handschuh",en:"glove",note:"masc • die Handschuhe"},
+    {de:"die Ruderhandschuhe",en:"rowing gloves",note:"plural only"},
+    {de:"die Uhr",en:"watch",note:"fem • die Uhren"},
+    {de:"der Schmuck",en:"jewellery",note:"masc • no plural"},
+    {de:"die Tasche",en:"bag",note:"fem • die Taschen"},
+    {de:"der Rucksack",en:"backpack",note:"masc • die Rucksäcke"},
+    {de:"die Wasserflasche",en:"water bottle",note:"fem • die Wasserflaschen"},
+    {de:"das Handtuch",en:"towel",note:"neuter • die Handtücher"},
+    {de:"die Wechselkleidung",en:"change of clothes",note:"fem • no plural"},
+    {de:"die Hose",en:"trousers",note:"fem • die Hosen"},
+    {de:"die Shorts",en:"shorts",note:"plural only"},
+    {de:"die Leggings",en:"leggings",note:"plural only"},
+    {de:"das T-Shirt",en:"T-shirt",note:"neuter • die T-Shirts"},
+    {de:"der Pullover",en:"jumper / sweater",note:"masc • die Pullover"},
+    {de:"die Ärmel",en:"sleeves",note:"plural only"}
+  ]}
+};
 
-  // Draw tick marks
-  function drawTicks() {
-    for (let i = 0; i < 60; i++) {
-      const angle = (i / 60) * 2 * Math.PI - Math.PI / 2;
-      const isMajor = i % 5 === 0;
-      const isQuarter = i % 15 === 0;
-      const inner = isMajor ? (isQuarter ? 102 : 108) : 118;
-      const outer = 128;
+let activeCat = "words", cards = [], index = 0, isFlipped = false;
+let mode = "de-en"; // "de-en" | "en-de" | "audio"
+let known = new Set(), unknown = new Set();
+const STORAGE_KEY = "rudern_known_v1";
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
-      const x1 = R + inner * Math.cos(angle);
-      const y1 = R + inner * Math.sin(angle);
-      const x2 = R + outer * Math.cos(angle);
-      const y2 = R + outer * Math.sin(angle);
+// Load known cards from localStorage, filtering out any older than 24h
+function loadKnown() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const data = JSON.parse(raw);
+    const now = Date.now();
+    // Remove expired entries
+    Object.keys(data).forEach(k => { if (now - data[k] > TWENTY_FOUR_HOURS) delete data[k]; });
+    return data;
+  } catch { return {}; }
+}
 
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-      line.setAttribute('stroke', isQuarter ? 'rgba(10,26,80,0.9)' : isMajor ? 'rgba(10,26,80,0.6)' : 'rgba(30,80,160,0.3)');
-      line.setAttribute('stroke-width', isQuarter ? '2.5' : isMajor ? '1.8' : '0.9');
-      line.setAttribute('stroke-linecap', 'round');
-      ticksEl.appendChild(line);
+function saveKnown(knownMap) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(knownMap)); } catch {}
+}
+
+// Returns a map of { cardKey: timestamp } for known cards
+function cardKey(catKey, cardDe) { return catKey + "|" + cardDe; }
+
+function getKnownTimestamps() { return loadKnown(); }
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function init() {
+  document.body.classList.add("mode-" + mode);
+  // Restore known cards from localStorage
+  const stored = getKnownTimestamps();
+  known = new Set();
+  Object.entries(stored).forEach(([k, ts]) => {
+    if (k.startsWith(activeCat + "|")) {
+      const de = k.split("|")[1];
+      const idx = CATEGORIES[activeCat].cards.findIndex(c => c.de === de);
+      if (idx >= 0) known.add(idx);
     }
-  }
+  });
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.innerHTML = "";
+  Object.entries(CATEGORIES).forEach(([key, cat]) => {
+    const btn = document.createElement("button");
+    btn.className = "tab" + (key === activeCat ? " active" : "");
+    btn.style.borderColor = key === activeCat ? cat.color : "#333";
+    btn.style.background = key === activeCat ? cat.color : "transparent";
+    btn.textContent = cat.emoji + " " + cat.label + " (" + cat.cards.length + ")";
+    btn.onclick = () => selectCat(key);
+    tabsEl.appendChild(btn);
+  });
+  // Filter out known cards from initial deck
+  cards = shuffle(CATEGORIES[activeCat].cards.filter((c, i) => !known.has(i)));
+  if (cards.length === 0) cards = shuffle(CATEGORIES[activeCat].cards);
+  render();
+  updateKnownCounter();
+}
 
-  // Draw numerals for 5-minute marks only
-  function drawNumerals() {
-    const minutes = [5,10,15,20,25,30,35,40,45,50,55,60];
-    const display = [5,10,15,20,25,30,35,40,45,50,55,60];
-    const numR = 90;
-
-    minutes.forEach((min, idx) => {
-      const angle = (min / 60) * 2 * Math.PI - Math.PI / 2;
-      const x = 148 + numR * Math.cos(angle);
-      const y = 148 + numR * Math.sin(angle);
-
-      const el = document.createElement('div');
-      el.className = 'numeral';
-      el.textContent = display[idx];
-      el.style.left = x + 'px';
-      el.style.top  = y + 'px';
-      el.style.fontSize = (min % 15 === 0) ? '15px' : '11px';
-      el.style.fontWeight = (min % 15 === 0) ? '700' : '400';
-      numeralsEl.appendChild(el);
-    });
-  }
-
-  drawTicks();
-  drawNumerals();
-
-  // ── Stopwatch logic ──
-  let running = false;
-  let startTime = null;
-  let elapsed = 0;
-  let lapElapsed = null;
-  let rafId = null;
-
-  const minuteHand   = document.getElementById('minuteHand');
-  const hourHand     = document.getElementById('hourHand');
-  const pupilL       = document.getElementById('pupil-hand-left');
-  const pupilR       = document.getElementById('pupil-hand-right');
-  const lapHand      = document.getElementById('lapHand');
-  const digitalReadout = document.getElementById('digitalReadout');
-  const elapsedDisplay = document.getElementById('elapsedDisplay');
-  const btnStart     = document.getElementById('btnStart');
-
-  function formatTime(ms) {
-    const totalSec = ms / 1000;
-    const mins = Math.floor(totalSec / 60);
-    const secs = Math.floor(totalSec % 60);
-    const tenths = Math.floor((ms % 1000) / 100);
-    return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${tenths}`;
-  }
-
-  function updateHands(ms) {
-    const totalSec = ms / 1000;
-    const totalMin = totalSec / 60;
-
-    // Minute hand: 1 full rotation per 60 minutes
-    // But we want sensitivity — show sub-minute on the main dial
-    // 1 full rotation = 60 min, so each min = 6 degrees
-    const minuteDeg = (totalMin % 60) * 6;
-    minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
-
-    // Hour hand: 1 full rotation per hour (show minutes elapsed /60)
-    // Re-purpose as "lap" reference — rotates once per 10 minutes for drama
-    const hourDeg = (totalMin % 10) / 10 * 360;
-    hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
-
-    // Pupil hands: rotate once per 60 seconds (the actual second indicator)
-    const secDeg = (totalSec % 60) / 60 * 360;
-    pupilL.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
-    pupilR.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
-
-    // Digital
-    digitalReadout.textContent = formatTime(ms);
-
-    // Elapsed text
-    const m = Math.floor(totalSec / 60);
-    const s = Math.floor(totalSec % 60);
-    elapsedDisplay.textContent = `${m} min · ${s} sec`;
-  }
-
-  function tick() {
-    if (!running) return;
-    elapsed = Date.now() - startTime;
-    updateHands(elapsed);
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function toggleWatch() {
-    if (!running) {
-      running = true;
-      startTime = Date.now() - elapsed;
-      btnStart.textContent = 'Lap / Stop';
-      requestAnimationFrame(tick);
-    } else {
-      // On second press: record lap, then stop on third
-      if (lapElapsed === null) {
-        // First stop = lap
-        lapElapsed = elapsed;
-        const lapDeg = (lapElapsed / 1000 / 60 % 60) * 6;
-        lapHand.style.transform = `translateX(-50%) rotate(${lapDeg}deg)`;
-        lapHand.classList.add('visible');
-        btnStart.textContent = 'Stop';
-      } else {
-        // Full stop
-        running = false;
-        cancelAnimationFrame(rafId);
-        btnStart.textContent = 'Resume';
-      }
+function selectCat(key) {
+  activeCat = key; cards = shuffle(CATEGORIES[key].cards);
+  index = 0; isFlipped = false; unknown = new Set();
+  // Restore known cards for this category
+  const stored = getKnownTimestamps();
+  known = new Set();
+  Object.entries(stored).forEach(([k, ts]) => {
+    if (k.startsWith(key + "|")) {
+      const de = k.split("|")[1];
+      const idx = CATEGORIES[key].cards.findIndex(c => c.de === de);
+      if (idx >= 0) known.add(idx);
     }
+  });
+  // Filter out known cards from the deck
+  cards = shuffle(CATEGORIES[key].cards.filter((c, i) => !known.has(i)));
+  if (cards.length === 0) cards = shuffle(CATEGORIES[key].cards); // all known, show all
+  document.querySelectorAll(".tab").forEach((btn, i) => {
+    const k = Object.keys(CATEGORIES)[i], cat = CATEGORIES[k];
+    btn.className = "tab" + (k === key ? " active" : "");
+    btn.style.borderColor = k === key ? cat.color : "#333";
+    btn.style.background = k === key ? cat.color : "transparent";
+  });
+  render();
+  updateKnownCounter();
+}
+
+function render() {
+  const cat = CATEGORIES[activeCat], card = cards[index];
+  document.getElementById("card-counter").textContent = "Card " + (index+1) + " / " + cards.length + " remaining";
+
+  // Blank front text immediately in audio mode to prevent any flicker
+  if (mode === "audio") {
+    document.getElementById("front-text").textContent = "";
   }
 
-  function resetWatch() {
-    running = false;
-    cancelAnimationFrame(rafId);
-    elapsed = 0;
-    lapElapsed = null;
-    startTime = null;
-    lapHand.classList.remove('visible');
-    btnStart.textContent = 'Start';
-    updateHands(0);
+  const front = document.getElementById("card-front");
+  front.className = "card-face card-front";
+  if (unknown.has(index)) front.classList.add("unknown");
+  document.getElementById("card-back").style.border = "2px solid " + cat.color + "44";
+
+  const ftEl = document.getElementById("front-text");
+  const speakBtn = document.getElementById("speak-btn");
+  const hintEl = document.getElementById("card-hint");
+  const backLangEl = document.getElementById("back-lang");
+  const btEl = document.getElementById("back-text");
+  const btDeEl = document.getElementById("back-text-de");
+  const noteEl = document.getElementById("back-note");
+
+  if (mode === "de-en") {
+    // Front: German word + speaker. Back: English
+    document.getElementById("front-lang").textContent = "🇩🇪 Deutsch";
+    document.getElementById("front-lang").style.color = cat.color;
+    ftEl.textContent = card.de;
+    ftEl.className = "card-text" + (card.de.length > 40 ? " long" : card.de.length > 25 ? " medium" : "");
+    speakBtn.style.display = "flex";
+    hintEl.textContent = "tap card to flip ↩";
+    backLangEl.textContent = "🇬🇧 English";
+    backLangEl.style.color = cat.color;
+    btEl.textContent = card.en;
+    btEl.className = "card-text" + (card.en.length > 40 ? " long" : card.en.length > 25 ? " medium" : "");
+    btDeEl.style.display = "none";
+    document.getElementById("speak-btn-back").style.display = "none";
+
+  } else if (mode === "en-de") {
+    // Front: English. Back: German word + speaker
+    document.getElementById("front-lang").textContent = "🇬🇧 English";
+    document.getElementById("front-lang").style.color = cat.color;
+    ftEl.textContent = card.en;
+    ftEl.className = "card-text" + (card.en.length > 40 ? " long" : card.en.length > 25 ? " medium" : "");
+    speakBtn.style.display = "none";
+    hintEl.textContent = "tap card to flip ↩";
+    backLangEl.textContent = "🇩🇪 Deutsch";
+    backLangEl.style.color = cat.color;
+    btEl.textContent = card.de;
+    btEl.className = "card-text" + (card.de.length > 40 ? " long" : card.de.length > 25 ? " medium" : "");
+    btDeEl.style.display = "none";
+    document.getElementById("speak-btn-back").style.display = "flex";
+
+  } else if (mode === "audio") {
+    // Front: speaker button only — text explicitly blanked first to prevent flicker
+    ftEl.textContent = "";
+    ftEl.className = "card-text";
+    document.getElementById("front-lang").textContent = "🔊 Listen & identify";
+    document.getElementById("front-lang").style.color = cat.color;
+    speakBtn.style.display = "flex";
+    speakBtn.style.width = "72px";
+    speakBtn.style.height = "72px";
+    speakBtn.style.fontSize = "36px";
+    speakBtn.style.marginTop = "0";
+    hintEl.textContent = "tap 🔈 to hear · tap card to reveal";
+    front.classList.add("audio-front");
+    // Back: German + English both shown
+    backLangEl.textContent = "🇩🇪 German  +  🇬🇧 English";
+    backLangEl.style.color = cat.color;
+    btEl.textContent = card.de;
+    btEl.className = "card-text" + (card.de.length > 40 ? " long" : card.de.length > 25 ? " medium" : "");
+    btDeEl.textContent = card.en;
+    btDeEl.style.display = "block";
+    btDeEl.className = "card-text medium";
+    document.getElementById("speak-btn-back").style.display = "none";
+
+  } else if (mode === "en-audio") {
+    // Front: English text. Back: big speaker button — no German text shown
+    document.getElementById("front-lang").textContent = "🇬🇧 English";
+    document.getElementById("front-lang").style.color = cat.color;
+    ftEl.textContent = card.en;
+    ftEl.className = "card-text" + (card.en.length > 40 ? " long" : card.en.length > 25 ? " medium" : "");
+    speakBtn.style.display = "none";
+    hintEl.textContent = "tap card to hear the German 🔊";
+    backLangEl.textContent = "🔊 Tap to hear the German";
+    backLangEl.style.color = cat.color;
+    btEl.textContent = "";
+    btDeEl.style.display = "none";
+    document.getElementById("speak-btn-back").style.display = "flex";
+    document.getElementById("speak-btn-back").style.width = "72px";
+    document.getElementById("speak-btn-back").style.height = "72px";
+    document.getElementById("speak-btn-back").style.fontSize = "36px";
+    document.getElementById("speak-btn-back").style.marginTop = "20px";
   }
 
-  updateHands(0);
+  // Reset speak button size if not audio/en-audio mode
+  if (mode !== "audio" && mode !== "en-audio") {
+    speakBtn.style.width = "46px"; speakBtn.style.height = "46px";
+    speakBtn.style.fontSize = "22px"; speakBtn.style.marginTop = "14px";
+  }
+
+  if (card.note && mode !== "audio") { noteEl.textContent = card.note; noteEl.style.display = "block"; }
+  else noteEl.style.display = "none";
+
+  isFlipped = false;
+  document.getElementById("card-inner").classList.remove("flipped");
+
+  // Auto-play in audio mode — slight delay so card animation completes first
+  if (mode === "audio") setTimeout(() => speakWord(), 500);
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById("card-inner").classList.toggle("flipped", isFlipped);
+  // In en-audio mode, auto-play German audio when card flips to back
+  if (mode === "en-audio" && isFlipped) {
+    setTimeout(() => speakWord(), 400);
+  }
+}
+
+function go(dir) {
+  const total = cards.length, wrap = document.getElementById("card-wrap");
+  // In audio mode blank text immediately before animation so it never shows during slide
+  if (mode === "audio") document.getElementById("front-text").textContent = "";
+  wrap.style.opacity = "0";
+  wrap.style.transform = dir > 0 ? "translateX(60px)" : "translateX(-60px)";
+  setTimeout(() => {
+    index = (index + dir + total) % total; render();
+    wrap.style.transition = "none"; wrap.style.opacity = "0";
+    wrap.style.transform = dir > 0 ? "translateX(-60px)" : "translateX(60px)";
+    setTimeout(() => { wrap.style.transition = "transform 0.22s ease, opacity 0.22s ease"; wrap.style.opacity = "1"; wrap.style.transform = "translateX(0)"; }, 20);
+  }, 200);
+}
+
+function markKnown() {
+  const card = cards[index];
+  // Save to localStorage with current timestamp
+  const stored = getKnownTimestamps();
+  stored[cardKey(activeCat, card.de)] = Date.now();
+  saveKnown(stored);
+  // Remove card from current deck
+  cards.splice(index, 1);
+  unknown.delete(index);
+  known = new Set(Object.keys(stored)
+    .filter(k => k.startsWith(activeCat + "|"))
+    .map(k => { const de = k.split("|")[1]; return CATEGORIES[activeCat].cards.findIndex(c => c.de === de); })
+    .filter(i => i >= 0));
+  if (cards.length === 0) {
+    // All done! Show celebration
+    document.getElementById("card-wrap").innerHTML = "<div style='text-align:center;padding:40px;color:#2a9d8f;font-size:22px;font-weight:600'>🎉 All cards known!<br><span style=\'font-size:14px;color:#888;font-family:monospace;font-weight:400\'>Come back tomorrow for a fresh session</span></div>";
+    document.getElementById("card-counter").textContent = "All done!";
+    return;
+  }
+  index = index % cards.length;
+  render();
+  updateKnownCounter();
+}
+
+function updateKnownCounter() {
+  const stored = getKnownTimestamps();
+  const total = CATEGORIES[activeCat].cards.length;
+  const knownCount = Object.keys(stored).filter(k => k.startsWith(activeCat + "|")).length;
+  document.getElementById("known-counter").textContent = "✓ " + knownCount + " / " + total + " known today";
+  const pct = Math.round((knownCount / total) * 100);
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-fill").style.background = "linear-gradient(90deg," + CATEGORIES[activeCat].color + ",#2a9d8f)";
+}
+function markUnknown() { unknown.add(index); known.delete(index); go(1); }
+function setMode(m) {
+  mode = m;
+  // Apply body class immediately so CSS hides text before JS render runs
+  document.body.classList.remove("mode-audio", "mode-de-en", "mode-en-de", "mode-en-audio");
+  document.body.classList.add("mode-" + m);
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("mode-" + m).classList.add("active");
+  isFlipped = false;
+  document.getElementById("card-inner").classList.remove("flipped");
+  render();
+}
+function shuffleDeck() { cards = shuffle(cards); index = 0; render(); }
+function resetToday() {
+  if (!confirm("Reset all known cards for today? They will appear again.")) return;
+  const stored = getKnownTimestamps();
+  Object.keys(stored).forEach(k => { if (k.startsWith(activeCat + "|")) delete stored[k]; });
+  saveKnown(stored);
+  known = new Set();
+  cards = shuffle(CATEGORIES[activeCat].cards);
+  index = 0;
+  render();
+  updateKnownCounter();
+}
+
+async function speakWord() {
+  const text = cards[index].de; // always speak German
+  const btn = document.getElementById("speak-btn");
+  btn.textContent = "🔊"; btn.classList.add("speaking");
+  const done = () => { btn.textContent = "🔈"; btn.classList.remove("speaking"); };
+
+  // Fetch Google Translate audio as a blob to avoid CORS issues
+  try {
+    const url = "https://translate.googleapis.com/translate_tts?ie=UTF-8&q=" + encodeURIComponent(text) + "&tl=de&client=gtx&ttsspeed=0.8";
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error("fetch failed");
+    const blob = await resp.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const audio = new Audio(objUrl);
+    audio.onended = () => { done(); URL.revokeObjectURL(objUrl); };
+    audio.onerror = () => { done(); URL.revokeObjectURL(objUrl); fallbackSpeak(text, done); };
+    await audio.play();
+  } catch {
+    fallbackSpeak(text, done);
+  }
+}
+
+function fallbackSpeak(text, done) {
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = "de-DE"; utt.rate = 0.85;
+  utt.onend = done; utt.onerror = done;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipCard(); }
+  if (e.key === "ArrowRight") go(1);
+  if (e.key === "ArrowLeft") go(-1);
+  if (e.key === "g") markKnown();
+  if (e.key === "b") markUnknown();
+});
+
+init();
 </script>
 </body>
 </html>
