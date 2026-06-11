@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Woofwatch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --espresso:   #0A1628;
+    --brass:      #2A6CC8;
+    --brass-light:#4B8FE8;
+    --brass-dark: #1A4A8A;
+    --ivory:      #D0E4F8;
+    --ivory-dark: #A8C8E8;
+    --mahogany:   #1A3A6A;
+    --shadow:     #050D1A;
+    --dog-fur:    #1B3A5C;
+    --dog-stripe: #22507A;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #0d2a4a 0%, #061528 70%, #020810 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Special Elite', cursive;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* Dust/grain overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .watch-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* ── Crown / top loop ── */
+  .crown-assembly {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Dog floppy ears ── */
+  .dog-ears {
+    display: flex;
+    gap: 120px;
+    margin-bottom: -18px;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .ear {
+    width: 36px;
+    height: 52px;
+    background: linear-gradient(160deg, #2A6CC8, #1A4A8A);
+    border-radius: 50% 50% 60% 60% / 30% 30% 70% 70%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 2px 4px rgba(100,180,255,0.15);
+    position: relative;
+  }
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px;
+    width: 22px; height: 36px;
+    background: linear-gradient(160deg, #3A80D8, #1A4A8A);
+    border-radius: 50% 50% 60% 60% / 30% 30% 70% 70%;
+    opacity: 0.5;
+  }
+  .ear.left  { transform: rotate(15deg) translateX(8px); }
+  .ear.right { transform: rotate(-15deg) translateX(-8px); }
+
+  .crown-loop {
+    width: 38px; height: 24px;
+    border: 5px solid var(--brass);
+    border-bottom: none;
+    border-radius: 19px 19px 0 0;
+    background: transparent;
+    box-shadow: 0 -2px 8px rgba(42,108,200,0.3), inset 0 2px 4px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .crown-stem {
+    width: 14px; height: 22px;
+    background: linear-gradient(90deg, var(--brass-dark), var(--brass-light), var(--brass-dark));
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    margin-top: -2px;
+    position: relative;
+    z-index: 0;
+  }
+
+  /* ── Main case ── */
+  .watch-case-outer {
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      #0d2a5a, #2A6CC8, #4B8FE8, #2A6CC8, #1A4A8A,
+      #2A6CC8, #4B8FE8, #2A6CC8, #0d2a5a, #2A6CC8,
+      #4B8FE8, #2A6CC8, #0d2a5a
+    );
+    padding: 8px;
+    box-shadow:
+      0 0 0 2px #061528,
+      0 8px 40px rgba(0,0,0,0.8),
+      0 0 60px rgba(42,108,200,0.2),
+      inset 0 2px 4px rgba(100,180,255,0.3);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .watch-case-inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 35% 30%, #0d2a4a, #061528 60%, #020810);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 4px 20px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.4);
+  }
+
+  /* ── Dial ── */
+  .dial {
+    width: 296px; height: 296px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 40% 35%, #EEF4FF, #D8E8F8 50%, #BACED8 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 2px 8px rgba(0,0,0,0.15),
+      inset 0 0 30px rgba(10,60,120,0.08);
+  }
+
+  /* Aged paper texture rings */
+  .dial::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 82%, rgba(10,60,120,0.1) 83%, transparent 84%),
+      radial-gradient(circle at 50% 50%, transparent 88%, rgba(10,60,120,0.06) 89%, transparent 90%);
+  }
+
+  /* Dog face markings */
+  .cat-markings {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(20,80,160,0.06) 0%, transparent 35%);
+  }
+
+  /* Minute track ring */
+  .minute-ring {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(10,60,120,0.15);
+  }
+
+  /* ── Tick marks ── */
+  .ticks {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ── Whisker lines ── */
+  .whiskers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* ── Dog nose (round) ── */
+  .cat-nose {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -18px);
+    width: 18px;
+    height: 14px;
+    background: radial-gradient(ellipse at 40% 35%, #334, #111);
+    border-radius: 50% 50% 45% 45%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.1);
+  }
+
+  /* ── Dog mouth ── */
+  .cat-mouth {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -6px);
+    width: 22px;
+    height: 10px;
+  }
+  .cat-mouth svg { overflow: visible; }
+
+  /* ── Eye sub-dials ── */
+  .eyes-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .eye-dial {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 40% 35%, #2a4a6a, #0d2a40 60%, #061520);
+    border: 2px solid var(--brass-dark);
+    box-shadow:
+      0 2px 8px rgba(0,0,0,0.5),
+      inset 0 1px 3px rgba(255,255,255,0.05);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .eye-dial.left  { transform: translate(-44px, -36px); }
+  .eye-dial.right { transform: translate(44px, -36px); }
+
+  /* Eye shine */
+  .eye-dial::before {
+    content: '';
+    position: absolute;
+    width: 10px; height: 6px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.5), transparent);
+    border-radius: 50%;
+    top: 8px; left: 10px;
+    pointer-events: none;
+  }
+
+  /* Pupil (second hand indicator) */
+  .pupil {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1a1a2e, #000);
+    box-shadow: 0 0 4px rgba(0,0,0,0.8);
+  }
+
+  .pupil-hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 18px;
+    background: linear-gradient(to top, transparent, #C87A88, #C87A88);
+    border-radius: 1px;
+  }
+
+  /* ── Centre pivot ── */
+  .pivot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--brass-light), var(--brass-dark));
+    box-shadow: 0 1px 4px rgba(0,0,0,0.6), 0 0 0 2px rgba(0,0,0,0.3);
+    z-index: 20;
+  }
+
+  /* ── Hands ── */
+  .hands {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hand-minute, .hand-hour {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-50%);
+    border-radius: 3px 3px 2px 2px;
+  }
+
+  .hand-minute {
+    width: 5px;
+    height: 118px;
+    background: linear-gradient(to top, #061528, #1a3a6a 40%, #0d2240 70%, #061528);
+    box-shadow: 1px 0 4px rgba(0,0,0,0.4);
+    margin-bottom: -8px;
+  }
+
+  .hand-minute::after {
+    content: '►';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+    font-size: 8px;
+    color: var(--brass);
+  }
+
+  .hand-hour {
+    width: 7px;
+    height: 76px;
+    background: linear-gradient(to top, #061528, #0d2a4a 40%, #061828 70%, #061528);
+    box-shadow: 1px 0 4px rgba(0,0,0,0.5);
+    margin-bottom: -6px;
+  }
+
+  /* ── Numerals ── */
+  .numeral {
+    position: absolute;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #0A1628;
+    text-align: center;
+    line-height: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ── Brand text ── */
+  .brand-text {
+    position: absolute;
+    text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 62%;
+    font-family: 'Special Elite', cursive;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #1A3A6A;
+    opacity: 0.7;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ── Digital readout ── */
+  .digital-readout {
+    position: absolute;
+    bottom: 22%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5,15,40,0.85);
+    border: 1px solid var(--brass-dark);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    color: var(--brass-light);
+    letter-spacing: 2px;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.5), 0 0 6px rgba(42,108,200,0.2);
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-start {
+    background: linear-gradient(135deg, #1A4A8A, var(--brass), #4B8FE8, var(--brass), #1A4A8A);
+    background-size: 200% 200%;
+    color: #EEF4FF;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(150,210,255,0.3);
+  }
+  .btn-start:hover { background-position: 100% 100%; box-shadow: 0 4px 18px rgba(42,108,200,0.4), inset 0 1px 0 rgba(150,210,255,0.3); }
+  .btn-start:active { transform: translateY(1px); }
+
+  .btn-reset {
+    background: linear-gradient(135deg, #061528, #0d2a4a, #061528);
+    color: var(--ivory-dark);
+    border: 1px solid var(--brass-dark);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  }
+  .btn-reset:hover { background: linear-gradient(135deg, #0d2a4a, #1a3a6a, #0d2a4a); }
+  .btn-reset:active { transform: translateY(1px); }
+
+  .elapsed-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    color: var(--brass-light);
+    letter-spacing: 1px;
+    opacity: 0.7;
+    text-align: center;
+  }
+
+  /* Lap ghost hand */
+  .hand-lap {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 100px;
+    background: linear-gradient(to top, transparent, rgba(42, 108, 200, 0.4));
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    margin-bottom: -6px;
+  }
+  .hand-lap.visible { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<div class="watch-wrapper">
+
+  <!-- Crown -->
+  <div class="crown-assembly">
+    <div class="dog-ears">
+      <div class="ear left"></div>
+      <div class="ear right"></div>
+    </div>
+    <div class="crown-loop"></div>
+    <div class="crown-stem"></div>
+  </div>
+
+  <!-- Main case -->
+  <div class="watch-case-outer">
+    <div class="watch-case-inner">
+      <div class="dial" id="dial">
+
+        <div class="cat-markings"></div>
+        <div class="minute-ring"></div>
+
+        <!-- Tick marks drawn by JS -->
+        <svg class="ticks" id="ticks" viewBox="0 0 296 296">
+          <!-- Dog cheek spots -->
+          <circle cx="88" cy="168" r="14" fill="rgba(42,108,200,0.07)"/>
+          <circle cx="208" cy="168" r="14" fill="rgba(42,108,200,0.07)"/>
+        </svg>
+
+        <!-- Numerals placed by JS -->
+        <div id="numerals"></div>
+
+        <!-- Eyes (sub-dials) -->
+        <div class="eyes-container">
+          <div class="eye-dial left" id="eye-left">
+            <div class="pupil-hand" id="pupil-hand-left"></div>
+          </div>
+          <div class="eye-dial right" id="eye-right">
+            <div class="pupil-hand" id="pupil-hand-right"></div>
+          </div>
+        </div>
+
+        <!-- Cat nose -->
+        <div class="cat-nose"></div>
+
+        <!-- Dog mouth -->
+        <div class="cat-mouth">
+          <svg width="28" height="14" viewBox="0 0 28 14">
+            <path d="M4 2 Q14 14 24 2" fill="none" stroke="rgba(10,40,100,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Lap ghost hand -->
+        <div class="hand-lap" id="lapHand"></div>
+
+        <!-- Hands -->
+        <div class="hands">
+          <div class="hand-hour" id="hourHand" style="transform: translateX(-50%) rotate(0deg);"></div>
+          <div class="hand-minute" id="minuteHand" style="transform: translateX(-50%) rotate(0deg);"></div>
+        </div>
+
+        <!-- Centre pivot -->
+        <div class="pivot"></div>
+
+        <!-- Brand -->
+        <div class="brand-text">Woofwatch · Swiss Wag</div>
+
+        <!-- Digital elapsed -->
+        <div class="digital-readout" id="digitalReadout">00:00.0</div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-reset" id="btnReset" onclick="resetWatch()">Reset</button>
+    <button class="btn btn-start" id="btnStart" onclick="toggleWatch()">Start</button>
+  </div>
+
+  <div class="elapsed-display" id="elapsedDisplay">0 min · 0 sec</div>
+
+</div>
+
+<script>
+  const R = 148; // dial radius (SVG units)
+  const ticksEl = document.getElementById('ticks');
+  const numeralsEl = document.getElementById('numerals');
+
+  // Draw tick marks
+  function drawTicks() {
+    for (let i = 0; i < 60; i++) {
+      const angle = (i / 60) * 2 * Math.PI - Math.PI / 2;
+      const isMajor = i % 5 === 0;
+      const isQuarter = i % 15 === 0;
+      const inner = isMajor ? (isQuarter ? 102 : 108) : 118;
+      const outer = 128;
+
+      const x1 = R + inner * Math.cos(angle);
+      const y1 = R + inner * Math.sin(angle);
+      const x2 = R + outer * Math.cos(angle);
+      const y2 = R + outer * Math.sin(angle);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke', isQuarter ? 'rgba(10,26,80,0.9)' : isMajor ? 'rgba(10,26,80,0.6)' : 'rgba(30,80,160,0.3)');
+      line.setAttribute('stroke-width', isQuarter ? '2.5' : isMajor ? '1.8' : '0.9');
+      line.setAttribute('stroke-linecap', 'round');
+      ticksEl.appendChild(line);
+    }
+  }
+
+  // Draw numerals for 5-minute marks only
+  function drawNumerals() {
+    const minutes = [5,10,15,20,25,30,35,40,45,50,55,60];
+    const display = [5,10,15,20,25,30,35,40,45,50,55,60];
+    const numR = 90;
+
+    minutes.forEach((min, idx) => {
+      const angle = (min / 60) * 2 * Math.PI - Math.PI / 2;
+      const x = 148 + numR * Math.cos(angle);
+      const y = 148 + numR * Math.sin(angle);
+
+      const el = document.createElement('div');
+      el.className = 'numeral';
+      el.textContent = display[idx];
+      el.style.left = x + 'px';
+      el.style.top  = y + 'px';
+      el.style.fontSize = (min % 15 === 0) ? '15px' : '11px';
+      el.style.fontWeight = (min % 15 === 0) ? '700' : '400';
+      numeralsEl.appendChild(el);
+    });
+  }
+
+  drawTicks();
+  drawNumerals();
+
+  // ── Stopwatch logic ──
+  let running = false;
+  let startTime = null;
+  let elapsed = 0;
+  let lapElapsed = null;
+  let rafId = null;
+
+  const minuteHand   = document.getElementById('minuteHand');
+  const hourHand     = document.getElementById('hourHand');
+  const pupilL       = document.getElementById('pupil-hand-left');
+  const pupilR       = document.getElementById('pupil-hand-right');
+  const lapHand      = document.getElementById('lapHand');
+  const digitalReadout = document.getElementById('digitalReadout');
+  const elapsedDisplay = document.getElementById('elapsedDisplay');
+  const btnStart     = document.getElementById('btnStart');
+
+  function formatTime(ms) {
+    const totalSec = ms / 1000;
+    const mins = Math.floor(totalSec / 60);
+    const secs = Math.floor(totalSec % 60);
+    const tenths = Math.floor((ms % 1000) / 100);
+    return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${tenths}`;
+  }
+
+  function updateHands(ms) {
+    const totalSec = ms / 1000;
+    const totalMin = totalSec / 60;
+
+    // Minute hand: 1 full rotation per 60 minutes
+    // But we want sensitivity — show sub-minute on the main dial
+    // 1 full rotation = 60 min, so each min = 6 degrees
+    const minuteDeg = (totalMin % 60) * 6;
+    minuteHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+
+    // Hour hand: 1 full rotation per hour (show minutes elapsed /60)
+    // Re-purpose as "lap" reference — rotates once per 10 minutes for drama
+    const hourDeg = (totalMin % 10) / 10 * 360;
+    hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+
+    // Pupil hands: rotate once per 60 seconds (the actual second indicator)
+    const secDeg = (totalSec % 60) / 60 * 360;
+    pupilL.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+    pupilR.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+
+    // Digital
+    digitalReadout.textContent = formatTime(ms);
+
+    // Elapsed text
+    const m = Math.floor(totalSec / 60);
+    const s = Math.floor(totalSec % 60);
+    elapsedDisplay.textContent = `${m} min · ${s} sec`;
+  }
+
+  function tick() {
+    if (!running) return;
+    elapsed = Date.now() - startTime;
+    updateHands(elapsed);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function toggleWatch() {
+    if (!running) {
+      running = true;
+      startTime = Date.now() - elapsed;
+      btnStart.textContent = 'Lap / Stop';
+      requestAnimationFrame(tick);
+    } else {
+      // On second press: record lap, then stop on third
+      if (lapElapsed === null) {
+        // First stop = lap
+        lapElapsed = elapsed;
+        const lapDeg = (lapElapsed / 1000 / 60 % 60) * 6;
+        lapHand.style.transform = `translateX(-50%) rotate(${lapDeg}deg)`;
+        lapHand.classList.add('visible');
+        btnStart.textContent = 'Stop';
+      } else {
+        // Full stop
+        running = false;
+        cancelAnimationFrame(rafId);
+        btnStart.textContent = 'Resume';
+      }
+    }
+  }
+
+  function resetWatch() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed = 0;
+    lapElapsed = null;
+    startTime = null;
+    lapHand.classList.remove('visible');
+    btnStart.textContent = 'Start';
+    updateHands(0);
+  }
+
+  updateHands(0);
+</script>
+</body>
+</html>
